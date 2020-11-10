@@ -1,38 +1,41 @@
-FROM pathtrk/docker-python3-opencv:contrib
+FROM ubuntu:focal
 
 LABEL maintener="Maximilian Zinke <me@mxzinke.dev>"
 
-RUN apt-get update && \	
-    apt-get install -y \
-      build-essential \
-      python-dev \
-      python3-dev \
-      locales \
-      libblas-dev \
-      liblapack-dev \
-      libatlas-base-dev \
-      autotools-dev \
-      libicu-dev \
-      libbz2-dev \
-      gfortran
+WORKDIR /app/
 
-# install gcc and g++ so that liblpclassifier_cv32 can utilize the library
-RUN echo 'deb http://deb.debian.org/debian/ sid main' >> /etc/apt/sources.list
+# Install OpenCV dependancies
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
-    apt-get install -y \
-      gcc-5 \
-      g++-5 && \
-    rm -rf /var/lib/apt/lists/*
+  apt-get install -y build-essential curl wget git pkg-config libgtk-3-dev \
+  libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
+  libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
+  gfortran openexr libatlas-base-dev python3-dev python3-numpy \
+  libtbb2 libtbb-dev libdc1394-22-dev
 
-# install cmake
-RUN apt-get remove -y cmake
-RUN curl -O https://cmake.org/files/v3.16/cmake-3.16.5-Linux-x86_64.sh
-RUN sh cmake-3.16.5-Linux-x86_64.sh --skip-license
+# install CMake
+RUN apt-get remove --purge --auto-remove cmake
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+RUN echo 'deb https://apt.kitware.com/ubuntu/ focal main' >> /etc/apt/sources.list
+RUN apt-get update && apt-get install -y cmake
 
-# set the locale to en_US.UTF-8 to perform migrations successfully
-ENV DEBIAN_FRONTEND noninteractive
-RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
-    locale-gen en_US.UTF-8 && \
-    dpkg-reconfigure locales && \
-    /usr/sbin/update-locale LANG=en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+# Install OpenCV
+RUN apt-get install unzip
+
+RUN curl -LO https://github.com/opencv/opencv_contrib/archive/4.5.0.zip \
+  && unzip 4.5.0.zip \
+  && rm 4.5.0.zip
+RUN curl -LO https://github.com/opencv/opencv/archive/4.5.0.zip \
+  && unzip 4.5.0.zip \
+  && rm 4.5.0.zip
+RUN mkdir -p /app/opencv-4.5.0/build && cd /app/opencv-4.5.0/build
+RUN cmake /app/opencv-4.5.0/ -D CMAKE_BUILD_TYPE=RELEASE \
+  -D CMAKE_INSTALL_PREFIX=/usr/local \
+  -D OPENCV_GENERATE_PKGCONFIG=ON \
+  -D OPENCV_EXTRA_MODULES_PATH=/app/opencv_contrib-4.5.0/modules
+RUN cmake --build .
+# optimized for 4 cores!
+RUN make -j4
+RUN make install
+RUN rm -r /app/opencv-4.5.0 \
+  && rm -r /app/opencv_contrib-4.5.0

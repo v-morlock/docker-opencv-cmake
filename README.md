@@ -1,5 +1,7 @@
 # Docker Image with OpenCV and CMake
 
-Docker Image with OpenCV and CMake v3.16. Also as an peer-dependancy Python is included.
+> This image is optimized for 4 CPU-cores
 
-Available on dockerhub `mxzinke/docker-opencv-cmake`.
+Docker Image with OpenCV v4.5.0 and CMake v3.16.5. Also as an peer-dependancy Python is included.
+
+Available on dockerhub `mxzinke/opencv-cmake`.

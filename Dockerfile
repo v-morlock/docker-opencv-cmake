@@ -2,9 +2,9 @@ FROM ubuntu:focal
 
 LABEL maintener="Maximilian Zinke <me@mxzinke.dev>"
 
-WORKDIR /dependancies/
+WORKDIR /dependencies/
 
-# Install OpenCV dependancies
+# Install OpenCV dependencies
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
   apt-get install -y build-essential curl wget git pkg-config libgtk-3-dev \
@@ -28,14 +28,14 @@ RUN curl -LO https://github.com/opencv/opencv_contrib/archive/4.5.0.zip \
 RUN curl -LO https://github.com/opencv/opencv/archive/4.5.0.zip \
   && unzip 4.5.0.zip \
   && rm 4.5.0.zip
-RUN mkdir -p /dependancies/opencv-4.5.0/build && cd /dependancies/opencv-4.5.0/build
-RUN cmake /dependancies/opencv-4.5.0/ -D CMAKE_BUILD_TYPE=RELEASE \
+RUN mkdir -p /dependencies/opencv-4.5.0/build && cd /dependencies/opencv-4.5.0/build
+RUN cmake /dependencies/opencv-4.5.0/ -D CMAKE_BUILD_TYPE=RELEASE \
   -D CMAKE_INSTALL_PREFIX=/usr/local \
   -D OPENCV_GENERATE_PKGCONFIG=ON \
-  -D OPENCV_EXTRA_MODULES_PATH=/dependancies/opencv_contrib-4.5.0/modules
+  -D OPENCV_EXTRA_MODULES_PATH=/dependencies/opencv_contrib-4.5.0/modules
 RUN cmake --build .
 # optimized for 4 cores!
 RUN make -j4
 RUN make install
-RUN rm -r /dependancies/opencv-4.5.0 \
-  && rm -r /dependancies/opencv_contrib-4.5.0
+RUN rm -r /dependencies/opencv-4.5.0 \
+  && rm -r /dependencies/opencv_contrib-4.5.0

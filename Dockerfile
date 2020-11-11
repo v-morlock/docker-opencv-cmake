@@ -2,7 +2,7 @@ FROM ubuntu:focal
 
 LABEL maintener="Maximilian Zinke <me@mxzinke.dev>"
 
-WORKDIR /dependancies/
+WORKDIR /dependencies/
 
 # Install OpenCV dependancies
 ARG DEBIAN_FRONTEND=noninteractive

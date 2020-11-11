@@ -2,7 +2,7 @@ FROM ubuntu:focal
 
 LABEL maintener="Maximilian Zinke <me@mxzinke.dev>"
 
-WORKDIR /app/
+WORKDIR /dependancies/
 
 # Install OpenCV dependancies
 ARG DEBIAN_FRONTEND=noninteractive
@@ -28,14 +28,14 @@ RUN curl -LO https://github.com/opencv/opencv_contrib/archive/4.5.0.zip \
 RUN curl -LO https://github.com/opencv/opencv/archive/4.5.0.zip \
   && unzip 4.5.0.zip \
   && rm 4.5.0.zip
-RUN mkdir -p /app/opencv-4.5.0/build && cd /app/opencv-4.5.0/build
-RUN cmake /app/opencv-4.5.0/ -D CMAKE_BUILD_TYPE=RELEASE \
+RUN mkdir -p /dependancies/opencv-4.5.0/build && cd /dependancies/opencv-4.5.0/build
+RUN cmake /dependancies/opencv-4.5.0/ -D CMAKE_BUILD_TYPE=RELEASE \
   -D CMAKE_INSTALL_PREFIX=/usr/local \
   -D OPENCV_GENERATE_PKGCONFIG=ON \
-  -D OPENCV_EXTRA_MODULES_PATH=/app/opencv_contrib-4.5.0/modules
+  -D OPENCV_EXTRA_MODULES_PATH=/dependancies/opencv_contrib-4.5.0/modules
 RUN cmake --build .
 # optimized for 4 cores!
 RUN make -j4
 RUN make install
-RUN rm -r /app/opencv-4.5.0 \
-  && rm -r /app/opencv_contrib-4.5.0
+RUN rm -r /dependancies/opencv-4.5.0 \
+  && rm -r /dependancies/opencv_contrib-4.5.0
